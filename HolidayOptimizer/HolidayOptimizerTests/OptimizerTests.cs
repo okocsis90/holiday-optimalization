@@ -1,10 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using HolidayOptimizer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HolidayOptimizer.Tests
 {
@@ -16,7 +12,8 @@ namespace HolidayOptimizer.Tests
         "Input list is empty, please add Destinations to your list.")]
         public void OptimizeTest_InputIsEmpty_ThrowsException()
         {
-            Optimizer.Optimize(new List<DestinationNode>());
+            Optimizer optimizer = new Optimizer(new List<DestinationNode>());
+            optimizer.Optimize();
         }
 
         [TestMethod()]
@@ -35,7 +32,8 @@ namespace HolidayOptimizer.Tests
                 locB,
                 locC
             };
-            Optimizer.Optimize(allLocations);
+            Optimizer optimizer = new Optimizer(allLocations);
+            optimizer.Optimize();
         }
 
         [TestMethod()]
@@ -51,7 +49,8 @@ namespace HolidayOptimizer.Tests
                 locB,
                 locC
             };
-            Optimizer.Optimize(allLocations);
+            Optimizer optimizer = new Optimizer(allLocations);
+            optimizer.Optimize();
         }
 
         [TestMethod()]
@@ -62,7 +61,8 @@ namespace HolidayOptimizer.Tests
                 new DestinationNode("Location B"),
                 new DestinationNode("Location C")
             };
-            CollectionAssert.AreEqual(allLocations, Optimizer.Optimize(allLocations));
+            Optimizer optimizer = new Optimizer(allLocations);
+            CollectionAssert.AreEqual(allLocations, optimizer.Optimize());
         }
 
         [TestMethod()]
@@ -82,7 +82,8 @@ namespace HolidayOptimizer.Tests
                 locB,
                 locA
             };
-            CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));
+            Optimizer optimizer = new Optimizer(allLocations);
+            CollectionAssert.AreEqual(expectedLocations, optimizer.Optimize());
         }
         
         [TestMethod()]
@@ -102,7 +103,8 @@ namespace HolidayOptimizer.Tests
                 locC,
                 locB
             };
-            CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));
+            Optimizer optimizer = new Optimizer(allLocations);
+            CollectionAssert.AreEqual(expectedLocations, optimizer.Optimize());
         }
 
         [TestMethod()]
@@ -131,7 +133,8 @@ namespace HolidayOptimizer.Tests
                 locF,
                 locD
             };
-            CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));            
+            Optimizer optimizer = new Optimizer(allLocations);
+            CollectionAssert.AreEqual(expectedLocations, optimizer.Optimize());            
         }        
     }
 }

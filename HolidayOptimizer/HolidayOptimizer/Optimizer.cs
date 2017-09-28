@@ -1,65 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HolidayOptimizer
 {
     public class Optimizer
     {
-        public static List<DestinationNode> Optimize(List<DestinationNode> inputNodes)
-        {
-            if (inputNodes.Count == 0)
-            {
-                throw new ArgumentException("Input list is empty, please add Destinations to your list.");
-            }
-            if (CheckIfDependent(inputNodes))
-            {
-                return inputNodes;
-            }
+        private List<DestinationNode> OutputNodes { get; set; }
+        private List<DestinationNode> Nodes { get; set; }        
 
-            List<DestinationNode> outputNodes = new List<DestinationNode>();
+        public Optimizer(List<DestinationNode> inputNodes)
+        {
+            Nodes = inputNodes;
+            OutputNodes = new List<DestinationNode>();
+        }
+
+        public List<DestinationNode> Optimize()
+        {
+            CheckInputValidity();
+            if (CheckIfDependent())
+            {
+                return Nodes;
+            }            
             Stack<DestinationNode> destinationTracker = new Stack<DestinationNode>();
             DestinationNode currentNode;
-            for (int i = 0; i < inputNodes.Count; i++)
+            for (int i = 0; i < Nodes.Count; i++)
             {
-                currentNode = inputNodes[i];
+                currentNode = Nodes[i];
                 while (currentNode.Previous != null)
                 {
-                    if (destinationTracker.Contains(currentNode))
-                    {
-                        throw new ArgumentException("Circular dependency is not allowed. Please check your input nodes.");
-                    }
-                    if (outputNodes.Contains(currentNode.Previous) && (currentNode.Previous.Next != currentNode && currentNode.Previous.Next != null))
-                    {
-                        throw new ArgumentException("One Destination cannot be the previous Destination for multiple Destinations.");
-                    }
+                    CheckCircularDependency(currentNode, destinationTracker);
+                    CheckMultipleNextNodes(currentNode);
                     destinationTracker.Push(currentNode);
-                    DestinationNode savedCurrent = currentNode;
-                    currentNode = currentNode.Previous;
-                    currentNode.Next = savedCurrent;
+                    SwapCurrentNode(ref currentNode);
                 }
                 destinationTracker.Push(currentNode);
                 while (destinationTracker.Count > 0)
                 {
-                    if (!outputNodes.Contains(destinationTracker.Peek()))
-                    {
-                        outputNodes.Add(destinationTracker.Pop());
-                    } else
-                    {
-                        destinationTracker.Pop();
-                    }
+                    FillOutputFromStack(ref destinationTracker);
                 }
-
             }
-            return outputNodes;
+            return OutputNodes;
         }
 
-        private static bool CheckIfDependent(List<DestinationNode> input)
+        private void CheckInputValidity()
+        {
+            if (Nodes.Count == 0)
+            {
+                throw new ArgumentException("Input list is empty, please add Destinations to your list.");
+            }
+        }
+
+        private void FillOutputFromStack(ref Stack<DestinationNode> destinationTracker)
+        {
+            if (!OutputNodes.Contains(destinationTracker.Peek()))
+            {
+                OutputNodes.Add(destinationTracker.Pop());
+            }
+            else
+            {
+                destinationTracker.Pop();
+            }
+        }
+
+        private void SwapCurrentNode(ref DestinationNode currentNode)
+        {
+            DestinationNode savedCurrent = currentNode;
+            currentNode = currentNode.Previous;
+            currentNode.Next = savedCurrent;
+        }
+
+        private void CheckMultipleNextNodes(DestinationNode currentNode)
+        {
+            if (OutputNodes.Contains(currentNode.Previous) && (currentNode.Previous.Next != currentNode && currentNode.Previous.Next != null))
+            {
+                throw new ArgumentException("One Destination cannot be the previous Destination for multiple Destinations.");
+            }
+        }
+
+        private void CheckCircularDependency(DestinationNode currentNode, Stack<DestinationNode> destinationTracker)
+        {
+            if (destinationTracker.Contains(currentNode))
+            {
+                throw new ArgumentException("Circular dependency is not allowed. Please check your input nodes.");
+            }
+        }
+
+        private bool CheckIfDependent()
         {
             bool inputIsEqualToOutput = true;
-            foreach (DestinationNode destination in input)
+            foreach (DestinationNode destination in Nodes)
             {
                 if (destination.Previous != null)
                 {
