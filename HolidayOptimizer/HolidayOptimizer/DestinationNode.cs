@@ -10,6 +10,7 @@ namespace HolidayOptimizer
     {
         public string Name { get; set; }
         public DestinationNode Previous { get; set; }
+        public DestinationNode Next { get; set; }
 
         public DestinationNode(string name)
         {

@@ -20,6 +20,41 @@ namespace HolidayOptimizer.Tests
         }
 
         [TestMethod()]
+        [ExpectedException(typeof(ArgumentException),
+        "Circular dependency is not allowed. Please check your input nodes.")]
+        public void OptimizeTest_InputHasCircularDependency_ThrowsException()
+        {
+            DestinationNode locA = new DestinationNode("Location A");
+            DestinationNode locB = new DestinationNode("Location B");
+            DestinationNode locC = new DestinationNode("Location C");
+            locA.Previous = locB;
+            locB.Previous = locC;
+            locC.Previous = locA;
+            List<DestinationNode> allLocations = new List<DestinationNode> {
+                locA,
+                locB,
+                locC
+            };
+            Optimizer.Optimize(allLocations);
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(ArgumentException),
+        "One Destination cannot be the previous Destination for multiple Destinations.")]
+        public void OptimizeTest_DestinationIsThePreviousOfMultipleDestinations_ThrowsException()
+        {
+            DestinationNode locA = new DestinationNode("Location A");
+            DestinationNode locB = new DestinationNode("Location B", locA);
+            DestinationNode locC = new DestinationNode("Location C", locA);
+            List<DestinationNode> allLocations = new List<DestinationNode> {
+                locA,
+                locB,
+                locC
+            };
+            Optimizer.Optimize(allLocations);
+        }
+
+        [TestMethod()]
         public void OptimizeTest_InputHasNoDependencies_GivesBackInput()
         {
             List<DestinationNode> allLocations = new List<DestinationNode> {
@@ -50,7 +85,53 @@ namespace HolidayOptimizer.Tests
             CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));
         }
         
+        [TestMethod()]
+        public void OptimizeTest_InputHasTwoDependencies_GivesProperOutput()
+        {
+            DestinationNode locA = new DestinationNode("Location A");
+            DestinationNode locC = new DestinationNode("Location C", locA);
+            DestinationNode locB = new DestinationNode("Location B", locC);
+            List<DestinationNode> allLocations = new List<DestinationNode> {
+                locB,
+                locC,
+                locA
+            };
+            List<DestinationNode> expectedLocations = new List<DestinationNode>
+            {
+                locA,
+                locC,
+                locB
+            };
+            CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));
+        }
 
-        
+        [TestMethod()]
+        public void OptimizeTest_InputHasDependenciesOfTwoGroup_GivesProperOutput()
+        {
+            DestinationNode locA = new DestinationNode("Location A");
+            DestinationNode locC = new DestinationNode("Location C", locA);
+            DestinationNode locB = new DestinationNode("Location B", locC);
+            DestinationNode locE = new DestinationNode("Location D");
+            DestinationNode locF = new DestinationNode("Location E", locE);
+            DestinationNode locD = new DestinationNode("Location F", locF);
+            List<DestinationNode> allLocations = new List<DestinationNode> {
+                locB,
+                locF,
+                locD,
+                locC,
+                locA,
+                locE
+            };
+            List<DestinationNode> expectedLocations = new List<DestinationNode>
+            {
+                locA,
+                locC,
+                locB,
+                locE,
+                locF,
+                locD
+            };
+            CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));            
+        }        
     }
 }

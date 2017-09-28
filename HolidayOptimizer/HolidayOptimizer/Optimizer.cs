@@ -35,18 +35,33 @@ namespace HolidayOptimizer
             for (int i = 0; i < inputNodes.Count; i++)
             {
                 currentNode = inputNodes[i];
-                if (!outputNodes.Contains(currentNode)){
-                    while (currentNode.Previous != null)
+                while (currentNode.Previous != null)
+                {
+                    if (destinationTracker.Contains(currentNode))
                     {
-                        destinationTracker.Push(currentNode);
-                        currentNode = currentNode.Previous;
+                        throw new ArgumentException("Circular dependency is not allowed. Please check your input nodes.");
+                    }
+                    if (outputNodes.Contains(currentNode.Previous) && (currentNode.Previous.Next != currentNode && currentNode.Previous.Next != null))
+                    {
+                        throw new ArgumentException("One Destination cannot be the previous Destination for multiple Destinations.");
                     }
                     destinationTracker.Push(currentNode);
-                    while (destinationTracker.Count > 0)
+                    DestinationNode savedCurrent = currentNode;
+                    currentNode = currentNode.Previous;
+                    currentNode.Next = savedCurrent;
+                }
+                destinationTracker.Push(currentNode);
+                while (destinationTracker.Count > 0)
+                {
+                    if (!outputNodes.Contains(destinationTracker.Peek()))
                     {
                         outputNodes.Add(destinationTracker.Pop());
+                    } else
+                    {
+                        destinationTracker.Pop();
                     }
                 }
+
             }
             return outputNodes;
         }
