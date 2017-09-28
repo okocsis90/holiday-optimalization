@@ -14,17 +14,7 @@ namespace HolidayOptimizer
             {
                 throw new ArgumentException("Input list is empty, please add Destinations to your list.");
             }
-
-            bool inputIsEqualToOutput = true;
-            foreach (DestinationNode destination in inputNodes)
-            {
-                if (destination.Previous != null)
-                {
-                    inputIsEqualToOutput = false;
-                    break;
-                }
-            }
-            if (inputIsEqualToOutput)
+            if (CheckIfDependent(inputNodes))
             {
                 return inputNodes;
             }
@@ -64,6 +54,20 @@ namespace HolidayOptimizer
 
             }
             return outputNodes;
+        }
+
+        private static bool CheckIfDependent(List<DestinationNode> input)
+        {
+            bool inputIsEqualToOutput = true;
+            foreach (DestinationNode destination in input)
+            {
+                if (destination.Previous != null)
+                {
+                    inputIsEqualToOutput = false;
+                    break;
+                }
+            }
+            return inputIsEqualToOutput;
         }
     }
 }
