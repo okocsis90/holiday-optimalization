@@ -14,6 +14,7 @@ namespace HolidayOptimizer
             {
                 throw new ArgumentException("Input list is empty, please add Destinations to your list.");
             }
+
             bool inputIsEqualToOutput = true;
             foreach (DestinationNode destination in inputNodes)
             {
@@ -27,8 +28,27 @@ namespace HolidayOptimizer
             {
                 return inputNodes;
             }
-            List<DestinationNode> resultNodes = new List<DestinationNode>();
-            return resultNodes;
+
+            List<DestinationNode> outputNodes = new List<DestinationNode>();
+            Stack<DestinationNode> destinationTracker = new Stack<DestinationNode>();
+            DestinationNode currentNode;
+            for (int i = 0; i < inputNodes.Count; i++)
+            {
+                currentNode = inputNodes[i];
+                if (!outputNodes.Contains(currentNode)){
+                    while (currentNode.Previous != null)
+                    {
+                        destinationTracker.Push(currentNode);
+                        currentNode = currentNode.Previous;
+                    }
+                    destinationTracker.Push(currentNode);
+                    while (destinationTracker.Count > 0)
+                    {
+                        outputNodes.Add(destinationTracker.Pop());
+                    }
+                }
+            }
+            return outputNodes;
         }
     }
 }

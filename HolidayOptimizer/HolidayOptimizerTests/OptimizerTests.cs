@@ -26,10 +26,31 @@ namespace HolidayOptimizer.Tests
                 new DestinationNode("Location A"),
                 new DestinationNode("Location B"),
                 new DestinationNode("Location C")
-        };
-            Assert.AreEqual(allLocations, Optimizer.Optimize(allLocations));
-
-
+            };
+            CollectionAssert.AreEqual(allLocations, Optimizer.Optimize(allLocations));
         }
+
+        [TestMethod()]
+        public void OptimizeTest_InputHasOneDependency_GivesProperOutput()
+        {
+            DestinationNode locA = new DestinationNode("Location A");
+            DestinationNode locC = new DestinationNode("Location C");
+            DestinationNode locB = new DestinationNode("Location B", locC);
+            List<DestinationNode> allLocations = new List<DestinationNode> {
+                locB,
+                locC,
+                locA
+            };
+            List<DestinationNode> expectedLocations = new List<DestinationNode>
+            {
+                locC,
+                locB,
+                locA
+            };
+            CollectionAssert.AreEqual(expectedLocations, Optimizer.Optimize(allLocations));
+        }
+        
+
+        
     }
 }
